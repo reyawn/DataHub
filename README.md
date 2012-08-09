@@ -58,6 +58,7 @@ All DataHub actions can be chained i.e.:
 TODOS
 -----
 +   Go into further detail for queue + keep with late observers.
++   Perhaps switch default sync: false to async: false so watching is synchronous by default.
 
 Copyright and License Information
 ---------------------------------
