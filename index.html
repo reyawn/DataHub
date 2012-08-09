@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DataHub test</title>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="DataHub.js"></script>
+    <!--<script type="text/javascript" src="../enyo/enyo.js"></script>-->
+</head>
+<body>
+    <script type="text/javascript">
+        function App(name) {
+            this.name = name || "App";
+            console.log("App created.");
+        }
+        var app = new App();
+        DataHub.enhance(app);
+
+        function Watcher(name) {
+            this.name = name || "Watcher";	// Use the default name if a name argument isn't passed in the constructor.
+            this.data = this.data2 = null;
+
+            this.setData = function setData(data) {
+                this.data = data;
+                console.log("Data set:"+this.data);
+            };
+        }
+
+        var watcher = new Watcher("watcher.first");
+        var watcher2 = new Watcher("watcher.second");
+        app.observe({data: watcher}, {debug: true, queue: true});
+        app.share({data: "Punk"}, {name: app.name, keep: true});
+        app.share({data: "Noodle"}, {name: app.name, keep: true});
+        app.share({data: "Hello"}, {name: app.name, keep: true});
+        app.ignore({data: watcher});
+        app.observe({data: watcher2}, {debug: true, queue: true});
+    </script>
+</body>
+</html>
