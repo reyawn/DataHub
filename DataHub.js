@@ -33,7 +33,7 @@
  WATCHING        :    DataHub.watch    ({ something: myObject, something: myFunctionCallback }, { option: value });
  +    OPTIONS:
  +    newOnly: boolean    Ignores any "kept" data.
- +    sync: boolean       Data will be shared to the watcher synchronously
+ +    async: boolean      Data will be shared to the watcher asynchronously
  +    queue: boolean      Multiple asynchronous shares will be queued instead of sharing only the latest value
  +    name: string        Name of watcher
  +    debug: boolean      Show debug output for activity relating to watcher
@@ -53,7 +53,7 @@
  CLEARING        :    DataHub.clearHub();
 
  All DataHub actions can be chained i.e.:
- DataHub.share ({things:some}).watch ({things:this},{sync:true}).ignore ({things:this}).clearHub()
+ DataHub.share ({things:some}).watch ({things:this},{async:true}).ignore ({things:this}).clearHub()
  TODO: Go into further detail for queue + keep with late observers.
  **/
 var DataHub = (function defineDataHub(global) {
@@ -266,15 +266,10 @@ var DataHub = (function defineDataHub(global) {
         }
 
         var debug = DEBUG || shareObj.debug || watcher.debug;
-        debug && log.log("SHARE " + shareObj.shareId + ": " + shareObj.sharer + (watcher.sync ? "" : " (1 of 2)") + " ---> " + property + " ---> " + (watcher.watcher._DataHub.name || "watcherId: " + watcher.watcher._DataHub.watcherId) + "  " + (watcher.sync ? " SYNC" : "") + (watcher.queue ? " QUEUE" : "") + (watcher.debug ? " DEBUG" : ""));
+        debug && log.log("SHARE " + shareObj.shareId + ": " + shareObj.sharer + (watcher.async ? " (1 of 2)" : "" ) + " ---> " + property + " ---> " + (watcher.watcher._DataHub.name || "watcherId: " + watcher.watcher._DataHub.watcherId) + "  " + (watcher.async ? " ASYNC" : "") + (watcher.queue ? " QUEUE" : "") + (watcher.debug ? " DEBUG" : ""));
 
-        if (watcher.sync) {
-            // Share change notifications synchronously.
-            var shareData = (shareObj.multiple && isArray(shareObj.data)) ? shareObj.data : [shareObj.data];
-            watcher.watcher [method]
-                ? watcher.watcher [method].apply(watcher.watcher, shareData)
-                : watcher.watcher.apply(window, shareData);
-        } else {
+        if (watcher.async) {
+            // Share change notifications asynchronously.
             var transaction;
             if (!watcher.transaction || watcher.queue) {    // If we don't currently have a transaction, or we are queuing, we need to set up a new transaction.
                 transaction = {
@@ -291,7 +286,7 @@ var DataHub = (function defineDataHub(global) {
 
                 if (watcher.transaction) {                    // If we are queuing, a transaction may already exist.  We need a queue cleanup closure then since it needs to do extra work if we cancel the transactions.
                     var oldTransaction = watcher.transaction;
-                    oldTransaction.top = null;				// The previous transaction is no longer on top
+                    oldTransaction.top = null;    			// The previous transaction is no longer on top
                     transaction.qCleanup = function queueCleanup() {
                         oldTransaction.qCleanup ? oldTransaction.qCleanup() : oldTransaction.cleanup && oldTransaction.cleanup();
                         cleanup();
@@ -317,14 +312,20 @@ var DataHub = (function defineDataHub(global) {
                 transaction.qCleanup ? transaction.qCleanup() : transaction.cleanup();
             }
 
-            transaction.timeoutId = setTimeout(sharing, 15.625);					// Share change notifications asynchronously.
+            transaction.timeoutId = setTimeout(sharing, 15.625);
+        } else {
+            // Share change notifications synchronously.
+            var shareData = (shareObj.multiple && isArray(shareObj.data)) ? shareObj.data : [shareObj.data];
+            watcher.watcher [method]
+                ? watcher.watcher [method].apply(watcher.watcher, shareData)
+                : watcher.watcher.apply(window, shareData);
         }
     }
 
     function watch(watchMap, options) {
         /*	Used to watch for change notifications via shared properties (i.e. is24Hr).
          watchMap: {property:watcher}
-         options	: {debug:true|false, newOnly:true|false, queue:true|false, sync:true|false, name:"Watcher name"}  name is a string, other options are false by default
+         options	: {debug:true|false, newOnly:true|false, queue:true|false, async:true|false, name:"Watcher name"}  name is a string, other options are false by default
          */
         normalizeDataHubEnvironment();
 
@@ -334,7 +335,7 @@ var DataHub = (function defineDataHub(global) {
         }
 
         /* Handle passing an array of watches which can be used to set up watches with differing options.  Example:
-         \	watch ([[{property:watcher, ...},{sync:true}],[{property:data, ...},{queue:true}]]);
+         \	watch ([[{property:watcher, ...},{async:true}],[{property:data, ...},{queue:true}]]);
          */
         if (isArray(watchMap)) {
             var i = 0,
@@ -348,7 +349,7 @@ var DataHub = (function defineDataHub(global) {
         var debug,
             newOnly,
             queue,
-            sync,
+            async,
             name,
             property,
             watcher,
@@ -360,10 +361,10 @@ var DataHub = (function defineDataHub(global) {
             newOnly = !!options.newOnly;
             debug = !!options.debug;
             queue = !!options.queue;
-            sync = !!options.sync;
+            async = !!options.async;
             name = options.name ? options.name : false;
         } else {                                            // Otherwise, set all options to false:
-            newOnly = debug = queue = sync = name = false;
+            newOnly = debug = queue = async = name = false;
         }
 
         function watchOne(watcherObj, propName) {
@@ -386,7 +387,7 @@ var DataHub = (function defineDataHub(global) {
             // Set options on watcher
             watcher.debug = debug;
             watcher.queue = queue;
-            watcher.sync = sync;
+            watcher.async = async;
             (name || !(watcherObj._DataHub.name)) && (watcherObj._DataHub.name = name || watcherObj.name || defaultName);
 
             (DEBUG || debug) && log.log("WATCH: " + (watcherObj._DataHub.name || "watcherId: " + watcherObj._DataHub.watcherId) + " <--- " + propName + "  " + (newOnly ? " NEWONLY" : "") + (debug ? " DEBUG" : ""));

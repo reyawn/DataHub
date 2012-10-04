@@ -58,7 +58,7 @@ describe("DataHub", function defineDataHubTests() {
 
         var watcher = new Watcher();
 
-        app.observe({data: watcher}, {sync: true});
+        app.observe({data: watcher});
         app.share({data: "magic token"}, {keep: true});
 
         expect(app._DataHub.watches.data.share.sharer).toEqual("testDataHub_clearHub");
@@ -72,11 +72,11 @@ describe("DataHub", function defineDataHubTests() {
         expect(watcher.data).toEqual("magic token");
     });
 
-    it(".observe ({data: watcher}): Watches for data shared asynchronously.", function testDataHub_watchAsyncShare() {
+    it(".observe ({data: watcher}, {async: true}): Watches for data shared asynchronously.", function testDataHub_watchAsyncShare() {
 
         var watcher = new Watcher();
 
-        app.observe({data: watcher});
+        app.observe({data: watcher}, {async: true});
         app.share({data: 42});
 
         waitsFor(function () {
@@ -88,11 +88,11 @@ describe("DataHub", function defineDataHubTests() {
         });
     });
 
-    it(".observe ({data: watcher}, {sync:true}): Watches for data shared synchronously.", function testDataHub_watchSyncShare() {
+    it(".observe ({data: watcher}): Watches for data shared synchronously.", function testDataHub_watchSyncShare() {
 
         var watcher = new Watcher();
 
-        app.observe({data: watcher}, {sync: true});
+        app.observe({data: watcher});
         app.share({data: 42});
 
         expect(watcher.data).toEqual(42);
@@ -125,7 +125,7 @@ describe("DataHub", function defineDataHubTests() {
 
         spyOn(watcher, "setData").andCallThrough();
 
-        app.observe({data: watcher});
+        app.observe({data: watcher}, {async: true});
         app.share({data: 1});						//test sending numbers
 
         waitsFor(function () {
@@ -338,7 +338,7 @@ describe("DataHub", function defineDataHubTests() {
         var data,
             watcher = new Watcher();
 
-        app.observe({data: watcher}, {sync: true});
+        app.observe({data: watcher});
 
         //test sending numbers
         app.share({data: 1});
@@ -440,7 +440,7 @@ describe("DataHub", function defineDataHubTests() {
             spyOn(watcher, "setData").andCallThrough();
 
             app.share({data: "unkept value"});	// Share something before any watchers are set.
-            app.observe({data: watcher});		// Watch something that was already shared.
+            app.observe({data: watcher}, {async: true});		// Watch something that was already shared.
             expect(app._DataHub.watches.data.watchers[watcher._DataHub.watcherId].transaction).not.toBeDefined();	// No share transaction should be present.
             expect(app._DataHub.watches.data.share).not.toBeDefined();	// Share object should not be present
             expect(watcher.setData.callCount).toEqual(0);				// setData shouldn't have been called.
@@ -466,7 +466,7 @@ describe("DataHub", function defineDataHubTests() {
             spyOn(watcher, "setData").andCallThrough();
 
             app.share({data: "unkept value"});						// Share something before any watchers are set.
-            app.observe({data: watcher}, {sync: true});				// Watch something that was already shared.
+            app.observe({data: watcher});				// Watch something that was already shared.
 
             expect(app._DataHub.watches.data.watchers[watcher._DataHub.watcherId].transaction).not.toBeDefined();	// No share transaction should be present.
             expect(app._DataHub.watches.data.share).not.toBeDefined();		// Share object should not be present
@@ -503,7 +503,7 @@ describe("DataHub", function defineDataHubTests() {
             expect(app._DataHub.watches.data.share).toBeDefined();						// The "data" property should have kept data.
             expect(app._DataHub.watches.data.share.data).toEqual("retained value");	// The kept data should be what was shared previously.
 
-            app.observe({data: watcher});							// Watch something that was already shared.
+            app.observe({data: watcher}, {async: true});							// Watch something that was already shared.
 
             expect(watcher.data).toEqual(null);					// Confirm share hasn't happened synchronously
             expect(app._DataHub.watches.data.watchers[watcher._DataHub.watcherId].transaction).toBeDefined();							// A share transaction should be present.
@@ -527,7 +527,7 @@ describe("DataHub", function defineDataHubTests() {
             spyOn(watcher, "setData").andCallThrough();
 
             app.share({data: "retained value"}, {keep: true});		// Share something before any watchers are set.
-            app.observe({data: watcher}, {sync: true});				// Watch something that was already shared.
+            app.observe({data: watcher});				// Watch something that was already shared.
 
             expect(app._DataHub.watches.data.watchers[watcher._DataHub.watcherId].transaction).not.toBeDefined();	// No share transaction should be present since this was a synchronous share.
             expect(watcher.setData.callCount).toEqual(1);		// setData should have only been called once.
@@ -541,7 +541,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
             spyOn(watcher, "setData").andCallThrough();
 
-            app.observe({data: watcher});									// Watch something that hasn't been shared yet
+            app.observe({data: watcher}, {async: true});									// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -567,7 +567,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
             spyOn(watcher, "setData").andCallThrough();
 
-            app.observe({data: watcher}, {sync: true});			// Watch something that hasn't been shared yet
+            app.observe({data: watcher});			// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -581,7 +581,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
             spyOn(watcher, "setData").andCallThrough();
 
-            app.observe({data: watcher});
+            app.observe({data: watcher}, {async: true});
             expect(watcher.data).toEqual(null);	// Confirm share hasn't happened synchronously
 
             app.share({data: "retained value"}, {keep: true});
@@ -608,7 +608,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
             spyOn(watcher, "setData").andCallThrough();
 
-            app.observe({data: watcher}, {sync: true});			// Watch something that hasn't been shared yet
+            app.observe({data: watcher});			// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "retained value"}, {keep: true});
@@ -625,7 +625,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}): Doesn\'t "keep" data or "sync"', function testDataHub_dontKeepAsyncShare_WSS() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher});			// Watch something that hasn't been shared yet
+            app.observe({data: watcher}, {async: true});			// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -650,7 +650,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}, {keep: true}): Keeps data marked as "keep" for future watchers, share asynchronously.', function testDataHub_keepAsyncShare_WSS() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher});	// Watch something that hasn't been shared yet
+            app.observe({data: watcher}, {async: true});	// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "retained value"}, {keep: true});
@@ -675,7 +675,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}): Doesn\'t keep data for future watchers; share synchronously.', function testDataHub_dontKeepSyncShare_WSS() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {sync: true});	// Watch something that hasn't been shared yet
+            app.observe({data: watcher});	// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -688,7 +688,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}, {keep: true}): Keeps data marked as "keep" for future watchers; share synchronously.', function testDataHub_keepSyncShare_WSS() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {sync: true});			// Watch something that hasn't been shared yet
+            app.observe({data: watcher});			// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "retained value"}, {keep: true});
@@ -713,7 +713,7 @@ describe("DataHub", function defineDataHubTests() {
             };
 
             app.share({data: "unkept value"});
-            app.observe({data: watcher});
+            app.observe({data: watcher}, {async: true});
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value 2"});
@@ -729,7 +729,7 @@ describe("DataHub", function defineDataHubTests() {
 
             app.share({data: "unkept value"});
 
-            app.observe({data: watcher}, {sync: true});		// Watch something that hasn't been shared yet
+            app.observe({data: watcher});		// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value 2"});
@@ -751,7 +751,7 @@ describe("DataHub", function defineDataHubTests() {
 
             app.share({data: "retained value"}, {keep: true});
 
-            app.observe({data: watcher});
+            app.observe({data: watcher}, {async: true});
             expect(watcher.data).toEqual(null);	// Confirm share hasn't happened synchronously
 
             app.share({data: "retained value 2"}, {keep: true});
@@ -773,7 +773,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
 
             app.share({data: "retained value"}, {keep: true});
-            app.observe({data: watcher}, {sync: true});			// Watch something that hasn't been shared yet
+            app.observe({data: watcher});			// Watch something that hasn't been shared yet
             expect(watcher.data).toEqual("retained value");	// "Keep"ing should share with us immediately
 
             app.share({data: "retained value 2"}, {keep: true});
@@ -788,7 +788,7 @@ describe("DataHub", function defineDataHubTests() {
             app.share({data: "unkept value"});
             app.share({data: "unkept value 2"});
 
-            app.observe({data: watcher});
+            app.observe({data: watcher}, {async: true});
 
             var delayDone = false;
             setTimeout(function () {
@@ -814,7 +814,7 @@ describe("DataHub", function defineDataHubTests() {
             app.share({data: "unkept value 2"});
             expect(app._DataHub.watches.data.share).not.toBeDefined();
 
-            app.observe({data: watcher}, {sync: true});
+            app.observe({data: watcher});
             expect(app._DataHub.watches.data.share).not.toBeDefined();
             expect(watcher.data).toEqual(null);
 
@@ -859,7 +859,7 @@ describe("DataHub", function defineDataHubTests() {
                 };
             };
 
-            app.observe({data: watcher});
+            app.observe({data: watcher}, {async: true});
 
             waitsFor(function () {
                 return testDone;
@@ -891,7 +891,7 @@ describe("DataHub", function defineDataHubTests() {
 
             app.share({data: "retained value 2"}, {keep: true});
 
-            app.observe({data: watcher}, {sync: true});
+            app.observe({data: watcher});
             expect(watcher.data).toEqual("retained value 2");
 
             var delayDone = false;
@@ -914,7 +914,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
 
             app.share({data: "unkept value"});							// Share something before any watchers are set.
-            app.observe({data: watcher}, {queue: true});					// Watch something that was already shared; queue shares.
+            app.observe({data: watcher}, {async: true, queue: true});					// Watch something that was already shared; queue shares.
 
             var delayDone = false;
             setTimeout(function () {
@@ -935,7 +935,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
 
             app.share({data: "unkept value"});							// Share something before any watchers are set.
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that was already shared; queue shares.
+            app.observe({data: watcher}, {queue: true});		// Watch something that was already shared; queue shares.
 
             expect(app._DataHub.watches.data.share).not.toBeDefined();
             expect(watcher.data).toEqual(null);
@@ -950,7 +950,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
 
             app.share({data: "retained value"}, {keep: true});			// Share something before any watchers are set.
-            app.observe({data: watcher}, {queue: true});					// Watch something that was already shared; queue shares.
+            app.observe({data: watcher}, {async: true, queue: true});					// Watch something that was already shared; queue shares.
 
             expect(watcher.data).toEqual(null);						// Confirm share hasn't happened synchronously
 
@@ -967,7 +967,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
 
             app.share({data: "retained value"}, {keep: true});			// Share something before any watchers are set.
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that was already shared; queue shares.
+            app.observe({data: watcher}, {queue: true});		// Watch something that was already shared; queue shares.
 
             expect(watcher.data).toEqual("retained value");
         });
@@ -977,7 +977,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}): Doesn\'t "keep" data or "sync, queued"', function testDataHub_dontKeepAsyncShare_WSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true});			// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {async: true, queue: true});			// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
             app.share({data: "unkept value"});
 
@@ -999,7 +999,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}): Doesn\'t keep data for future watchers; share synchronously, queued.', function testDataHub_dontKeepSyncShare_WSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -1009,7 +1009,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}, {keep:true}): Keeps data marked as "keep" for future watchers; share asynchronously, queued.', function testDataHub_keepAsyncShare_WSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true});		// Queue shares
+            app.observe({data: watcher}, {async: true, queue: true});		// Queue shares
             expect(watcher.data).toEqual(null);			// Confirm share hasn't happened synchronously
 
             app.share({data: "retained value"}, {keep: true});
@@ -1026,7 +1026,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: {keep:true, sync:true}}): Keeps data marked as "keep" for future watchers; share synchronously, queued.', function testDataHub_keepSyncShare_WSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that hasn't been shared yet; queue shares.
+            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares.
             expect(watcher.data).toEqual(null);
 
             app.share({data: "retained value"}, {keep: true});
@@ -1039,7 +1039,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}): Doesn\'t "keep" data or "sync"; share asynchronously, queued', function testDataHub_dontKeepAsyncShare_WSSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {async: true, queue: true});		// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -1077,7 +1077,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: {sync:true}}): Doesn\'t keep data for future watchers; share synchronously, queued.', function testDataHub_dontKeepSyncShare_WSSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value"});
@@ -1090,7 +1090,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}, {keep:true}): Keeps data marked as "keep" for future watchers, share asynchronously, queued.', function testDataHub_keepAsyncShare_WSSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {async: true, queue: true});		// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "retained value"}, {keep: true});
@@ -1129,7 +1129,7 @@ describe("DataHub", function defineDataHubTests() {
         it('.share ({data: ...}, {keep:true}): Keeps data marked as "keep" for future watchers; share synchronously, queued.', function testDataHub_keepSyncShare_WSSQ() {
             var watcher = new Watcher();
 
-            app.observe({data: watcher}, {queue: true, sync: true});			// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {queue: true});			// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "retained value"}, {keep: true});
@@ -1153,7 +1153,7 @@ describe("DataHub", function defineDataHubTests() {
             };
 
             app.share({data: "unkept value"});
-            app.observe({data: watcher}, {queue: true});		// Queue shares
+            app.observe({data: watcher}, {async: true, queue: true});		// Queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value 2"});
@@ -1169,7 +1169,7 @@ describe("DataHub", function defineDataHubTests() {
 
             app.share({data: "unkept value"});
 
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual(null);
 
             app.share({data: "unkept value 2"});
@@ -1201,7 +1201,7 @@ describe("DataHub", function defineDataHubTests() {
 
             app.share({data: "retained value"}, {keep: true});
 
-            app.observe({data: watcher}, {queue: true});		// Queue shares
+            app.observe({data: watcher}, {async: true, queue: true});		// Queue shares
             expect(watcher.data).toEqual(null);			// Confirm share hasn't happened synchronously
 
             app.share({data: "retained value 2"}, {keep: true});
@@ -1227,7 +1227,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher();
 
             app.share({data: "retained value"}, {keep: true});
-            app.observe({data: watcher}, {queue: true, sync: true});		// Watch something that hasn't been shared yet; queue shares
+            app.observe({data: watcher}, {queue: true});		// Watch something that hasn't been shared yet; queue shares
             expect(watcher.data).toEqual("retained value");			// "Keep"ing should share with us immediately
 
             app.share({data: "retained value 2"}, {keep: true});
@@ -1242,7 +1242,7 @@ describe("DataHub", function defineDataHubTests() {
             app.share({data: "unkept value"});
             app.share({data: "unkept value 2"});
 
-            app.observe({data: watcher}, {queue: true});		// Queue shares
+            app.observe({data: watcher}, {async: true, queue: true});		// Queue shares
 
             waits(1000);									// Wait for any possible asynchronous shares to complete
 
@@ -1261,7 +1261,7 @@ describe("DataHub", function defineDataHubTests() {
             app.share({data: "unkept value 2"});
             expect(app._DataHub.watches.data.share).not.toBeDefined();
 
-            app.observe({data: watcher}, {queue: true, sync: true});				// Queue shares
+            app.observe({data: watcher}, {queue: true});				// Queue shares
             expect(app._DataHub.watches.data.share).not.toBeDefined();
             expect(watcher.data).toEqual(null);
 
@@ -1298,7 +1298,7 @@ describe("DataHub", function defineDataHubTests() {
                 };
             };
 
-            app.observe({data: watcher}, {queue: true});							// Queue shares
+            app.observe({data: watcher}, {async: true, queue: true});							// Queue shares
 
             waitsFor(function () {
                 return testDone;
@@ -1331,7 +1331,7 @@ describe("DataHub", function defineDataHubTests() {
             expect(app._DataHub.watches.data.share.shareId).not.toEqual(sId);	// New transaction ID for second share
             sId = app._DataHub.watches.data.share.shareId;
 
-            app.observe({data: watcher}, {queue: true, sync: true});				// Queue shares
+            app.observe({data: watcher}, {queue: true});				// Queue shares
             expect(watcher.data).toEqual("retained value 2");
 
             waits(1000);														// Wait for any further asynchronous shares to complete
@@ -1348,7 +1348,7 @@ describe("DataHub", function defineDataHubTests() {
             var watcher = new Watcher("Watcher One");
             var watcher2 = new Watcher("Watcher Two");
 
-            app.observe({data: watcher}, {sync: true});
+            app.observe({data: watcher});
             app.share([
                 [
                     {data: "value 1"}
@@ -1364,7 +1364,7 @@ describe("DataHub", function defineDataHubTests() {
             expect(watcher.data).toEqual("value 1");
             expect(watcher2.data2).toBeNull();
 
-            app.observe({data2: watcher2});
+            app.observe({data2: watcher2}, {async: true});
 
             waitsFor(function () {
                 return watcher2.data2 !== null;
@@ -1380,11 +1380,11 @@ describe("DataHub", function defineDataHubTests() {
 
             app.observe([
                 [
-                    {data: watcher},
-                    {sync: true}
+                    {data: watcher}
                 ],
                 [
-                    {data: watcher2}
+                    {data: watcher2},
+                    {async: true}
                 ]
             ]);
             app.share({data: "a value"});
@@ -1411,7 +1411,7 @@ describe("DataHub", function defineDataHubTests() {
                     watcher2
                 ],
                 data2: watcher
-            }, {sync: true});
+            });
 
             app.share({data: "value 1"});
             app.share({data2: "value 2"});
@@ -1432,14 +1432,13 @@ describe("DataHub", function defineDataHubTests() {
                         data: [
                             watcher,
                             watcher2
-                        ]},
-                    {sync: true}
+                        ]
+                    }
                 ],
                 [
                     {
                         data2: watcher
-                    },
-                    {sync: true}
+                    }
                 ]
             ]);
 
@@ -1464,7 +1463,7 @@ describe("DataHub", function defineDataHubTests() {
                 testDone = true;
             };
 
-            app.observe({data: watcher});
+            app.observe({data: watcher}, {async: true});
             app.share({data: ["value 1", "value 2"]}, {multiple: true});
 
             waitsFor(function () {
@@ -1486,7 +1485,7 @@ describe("DataHub", function defineDataHubTests() {
                 testDone = true;
             };
 
-            app.observe({data: watcher}, {sync: true});
+            app.observe({data: watcher});
             app.share({data: ["value 1", "value 2"]}, {multiple: true});
 
             expect(app._DataHub.watches.data.share).not.toBeDefined();
@@ -1499,7 +1498,7 @@ describe("DataHub", function defineDataHubTests() {
             ;
         spyOn(watcher, "setData").andCallThrough();
 
-        app.observe({data: watcher});
+        app.observe({data: watcher}, {async: true});
         app.share({data: "magic cookie1"});
         app.share({data: "magic cookie2"});
 
@@ -1519,7 +1518,7 @@ describe("DataHub", function defineDataHubTests() {
         var watcher = new Watcher();
 
         app.share({data: "retained value"}, {keep: true});			// Share something before any watchers are set.
-        app.observe({data: watcher}, {sync: true});					// Watch something that was already shared.
+        app.observe({data: watcher});					// Watch something that was already shared.
 
         expect(watcher.data).toBe("retained value");
     });
@@ -1528,7 +1527,7 @@ describe("DataHub", function defineDataHubTests() {
 
         var watcher = new Watcher();
 
-        app.observe({data: watcher}, {sync: true});
+        app.observe({data: watcher});
         app.share({data: "magic cookie"});
 
         app.ignore({data: watcher});
@@ -1536,7 +1535,7 @@ describe("DataHub", function defineDataHubTests() {
 
         expect(watcher.data).toEqual("magic cookie");
 
-        app.observe({data: watcher}, {sync: true});
+        app.observe({data: watcher});
         app.share({data: "success" });
 
         expect(watcher.data).toBe("success");
@@ -1546,7 +1545,7 @@ describe("DataHub", function defineDataHubTests() {
 
         var watcher = new Watcher();
 
-        app.observe({data: watcher});
+        app.observe({data: watcher}, {async: true});
         app.share({data: "magic cookie"});
 
         waitsFor(function () {
@@ -1573,16 +1572,16 @@ describe("DataHub", function defineDataHubTests() {
             watcher2 = new Watcher(),
             watcher3 = new Watcher();
 
-        app.observe({data: watcher}, {sync: true});
+        app.observe({data: watcher});
         app.share({data: "long-term retained value"}, {keep: true});
 
         //watcher should now have the retained value.
 
-        app.observe({data: watcher2}, {sync: true});
+        app.observe({data: watcher2});
         //watcher2 should now have the retained value
 
         app.free({data: true});
-        app.observe({data: watcher3}, {sync: true});
+        app.observe({data: watcher3});
 
         expect(watcher.data).toBe("long-term retained value");
         expect(watcher2.data).toBe("long-term retained value");
