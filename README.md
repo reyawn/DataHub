@@ -23,7 +23,7 @@ Using DataHub
 
 #### OPTIONS:
 +    newOnly: boolean    Ignores any "kept" data.
-+    sync: boolean       Data will be shared to the watcher synchronously
++    async: boolean      Data will be shared to the watcher asynchronously if true
 +    queue: boolean      Multiple asynchronous shares will be queued instead of sharing only the latest value
 +    name: string        Name of watcher
 +    debug: boolean      Show debug output for activity relating to watcher
@@ -53,12 +53,11 @@ Using DataHub
 ### Chaining
 All DataHub actions can be chained i.e.:
 
-    DataHub.share ({things:some}).watch ({things:this},{sync:true}).ignore ({things:this}).clearHub();
+    DataHub.share ({things:some}).watch ({things:this}).ignore ({things:this}).clearHub();
 
 TODOS
 -----
 +   Go into further detail for queue + keep with late observers.
-+   Perhaps switch default sync: false to async: false so watching is synchronous by default.
 
 Copyright and License Information
 ---------------------------------
