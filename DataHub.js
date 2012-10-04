@@ -65,7 +65,7 @@ var DataHub = (function defineDataHub(global) {
     var idKeyMap = {};						// Map of ids that need to be independently incremented
     function getNextIdByKey(key) {
         /*	Used to generate a the next id in a sequence.
-         \	key: string name of id to increment and return.
+        	key: string name of id to increment and return.
          */
         !idKeyMap[key] && (idKeyMap[key] = 0);										// Confirm that the key exists, if not initialize to the base value.
         idKeyMap[key] == Number.MAX_VALUE ? (idKeyMap[key] = 1) : ++idKeyMap[key];	// Validate and increment if possible
@@ -73,8 +73,8 @@ var DataHub = (function defineDataHub(global) {
     }
 
     function getMethod(property) {
-        /* Used to generate the setter function name off of a property name
-         \	property: string name of property.
+        /*  Used to generate the setter function name off of a property name
+            property: string name of property.
          */
         return "set" + property.charAt(0).toUpperCase() + property.substring(1);	// Auto-camel-case for setters i.e. is24Hr -> setIs24Hr.
     }
@@ -122,7 +122,7 @@ var DataHub = (function defineDataHub(global) {
 
     function ignore(watchMap) {
         /*	Used to ignore data sharing (i.e. is24Hr).
-         \	watchMap: {property:watcher} where watcher was previously added via DataHub.watch ({ property: watcher }).
+        	watchMap: {property:watcher} where watcher was previously added via DataHub.watch ({ property: watcher }).
          */
         normalizeDataHubEnvironment();
 
@@ -185,9 +185,9 @@ var DataHub = (function defineDataHub(global) {
 
     function share(shareMap, options, targetWatchers) {
         /*	Used to share data via known property names (i.e. is24Hr).
-         \	shareMap		: {property:data, ...} where data is received via watcher.setProperty (data) or a callback function if specified.
-         /	options			: {keep:true|false, multiple:true|false, debug:true|false, sharer:"Sharer name"}  name is a string, other options are false by default
-         \	targetWatchers	: [watcher,...] An array of watchers with whom this data should be shared.
+        	shareMap		: {property:data, ...} where data is received via watcher.setProperty (data) or a callback function if specified.
+        	options			: {keep:true|false, multiple:true|false, debug:true|false, sharer:"Sharer name"}  name is a string, other options are false by default
+        	targetWatchers	: [watcher,...] An array of watchers with whom this data should be shared.
          */
         normalizeDataHubEnvironment();
 
@@ -196,8 +196,8 @@ var DataHub = (function defineDataHub(global) {
             return this;
         }
 
-        /* Handle passing an array of shares which can be used to set up shares with differing options..  Example:
-         \	share ([[{property:data, ...},{keep:true}],[{property:data, ...}]]);
+        /*  Handle passing an array of shares which can be used to set up shares with differing options..  Example:
+        	share ([[{property:data, ...},{keep:true}],[{property:data, ...}]]);
          */
         if (isArray(shareMap)) {
             var i = 0,
@@ -324,9 +324,9 @@ var DataHub = (function defineDataHub(global) {
 
     function watch(watchMap, options) {
         /*	Used to watch for change notifications via shared properties (i.e. is24Hr).
-         watchMap: {property:watcher}
-         options	: {debug:true|false, newOnly:true|false, queue:true|false, async:true|false, name:"Watcher name"}  name is a string, other options are false by default
-         */
+            watchMap: {property:watcher}
+            options	: {debug:true|false, newOnly:true|false, queue:true|false, async:true|false, name:"Watcher name"}  name is a string, other options are false by default
+        */
         normalizeDataHubEnvironment();
 
         if (!watchMap) {
@@ -334,8 +334,8 @@ var DataHub = (function defineDataHub(global) {
             return this;
         }
 
-        /* Handle passing an array of watches which can be used to set up watches with differing options.  Example:
-         \	watch ([[{property:watcher, ...},{async:true}],[{property:data, ...},{queue:true}]]);
+        /*  Handle passing an array of watches which can be used to set up watches with differing options.  Example:
+        	watch ([[{property:watcher, ...},{async:true}],[{property:data, ...},{queue:true}]]);
          */
         if (isArray(watchMap)) {
             var i = 0,
@@ -378,7 +378,7 @@ var DataHub = (function defineDataHub(global) {
             watchers = property.watchers || (property.watchers = {});	// Cache the watch object's watchers map if it exists.  If not, create the watchers map.
 
             watcher = watchers [watcherObj._DataHub.watcherId];			// Is there an existing watcher object?
-            if (watcher && watcherObj != watcher.watcher) {                 // Another watcher exists using this watcher's id so:
+            if (watcher && watcherObj != watcher.watcher) {             // Another watcher exists using this watcher's id so:
                 watcherObj._DataHub.watcherId += String(Date.now());		// Append a timestamp to this watcher's id to make it unique.
                 watcher = null;												// The watcher doesn't exist now.
             }

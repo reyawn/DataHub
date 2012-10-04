@@ -17,26 +17,35 @@ enhance method as follows:
 
 Using DataHub
 -------------
-### Watching
+### Observing
+Note: Namespace collisions with ECMAScript additions/browser experiments have required supporting observe() instead, but watch() still works too if your browser supports it.
 
-    DataHub.watch    ({ something: myObject, something: myFunctionCallback }, { option: value });
+    DataHub.observe    ({ something: myObject, something: myFunctionCallback }, { option: value });
 
 #### OPTIONS:
 +    newOnly: boolean    Ignores any "kept" data.
-+    async: boolean      Data will be shared to the watcher asynchronously if true
++    async: boolean      Data will be shared to the observer asynchronously if true
 +    queue: boolean      Multiple asynchronous shares will be queued instead of sharing only the latest value
 +    name: string        Name of watcher
-+    debug: boolean      Show debug output for activity relating to watcher
++    debug: boolean      Show debug output for activity relating to observer
 
 ### Sharing
 
-    DataHub.share    ({ something: dataToShare}, { option: value }, [optionalWatcherArray]);
+    DataHub.share    ({ something: dataToShare}, { option: value }, [optionalObserverArray]);
 
 #### OPTIONS:
-+    keep: boolean       Data will be "kept" for late watchers
++    keep: boolean       Data will be "kept" for late observers
 +    multiple: boolean   Data represents multiple arguments
 +    sharer: string      Name of sharer
 +    debug: boolean      Show debug output for activity relating to share
+
+### Arrays of observations / shares
+An array of share or watch options can be passed i.e.:
+
+    DataHub.share   ([
+        [{something: thingToShare, ...}, {keep: true}],
+        [{someother: otherToShare, ...}]
+    ]);
 
 ### Freeing
 
@@ -53,7 +62,7 @@ Using DataHub
 ### Chaining
 All DataHub actions can be chained i.e.:
 
-    DataHub.share ({things:some}).watch ({things:this}).ignore ({things:this}).clearHub();
+    DataHub.share ({things:some}).observe ({things:this}).ignore ({things:this}).clearHub();
 
 TODOS
 -----
